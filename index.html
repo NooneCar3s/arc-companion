@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data: blob:; connect-src 'self' http://127.0.0.1:11434 http://localhost:11434;"
+  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARC Companion</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="windowbar">
+    <div class="windowbar-drag">
+      <div class="windowbar-brand">
+        <div class="windowbar-stripes">
+          <span class="windowbar-stripe"></span>
+          <span class="windowbar-stripe"></span>
+          <span class="windowbar-stripe"></span>
+          <span class="windowbar-stripe"></span>
+        </div>
+        <span>ARC Companion</span>
+      </div>
+    </div>
+
+    <div class="windowbar-actions">
+      <button class="windowbar-btn" id="minimizeWindowBtn" title="Свернуть">—</button>
+      <button class="windowbar-btn" id="maximizeWindowBtn" title="Развернуть">□</button>
+      <button class="windowbar-btn close" id="closeWindowBtn" title="Закрыть">✕</button>
+    </div>
+  </div>
+
+  <div class="auth-overlay" id="authOverlay">
+    <div class="auth-shell">
+      <div class="auth-brand-panel">
+        <div class="auth-brand-stripes">
+          <span class="auth-stripe auth-stripe-cyan"></span>
+          <span class="auth-stripe auth-stripe-green"></span>
+          <span class="auth-stripe auth-stripe-yellow"></span>
+          <span class="auth-stripe auth-stripe-red"></span>
+        </div>
+
+        <div class="auth-brand-copy">
+          <div class="auth-kicker">ARC RAIDERS COMPANION</div>
+          <h1>Личный доступ рейдера</h1>
+          <p id="authSideText">
+            Первый запуск. Создай локальный аккаунт, чтобы сохранить профиль, баланс и статистику рейдов.
+          </p>
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="showRegisterBtn" type="button">Регистрация</button>
+          <button class="auth-tab" id="showLoginBtn" type="button">Вход</button>
+        </div>
+
+        <form class="auth-form active" id="registerForm">
+          <div class="auth-form-title">Создать аккаунт</div>
+
+          <label class="form-field">
+            <span>Никнейм</span>
+            <input id="registerNickname" type="text" placeholder="ForRe4l" required />
+          </label>
+
+          <label class="form-field">
+            <span>Email</span>
+            <input id="registerEmail" type="email" placeholder="you@arc.local" required />
+          </label>
+
+          <label class="form-field">
+            <span>Пароль</span>
+            <input id="registerPassword" type="password" placeholder="Минимум 4 символа" required />
+          </label>
+
+          <label class="form-field">
+            <span>Стартовый баланс</span>
+            <input id="registerMoney" type="number" min="0" placeholder="0" required />
+          </label>
+
+          <button type="submit" class="panel-action-btn auth-submit-btn">Создать аккаунт</button>
+        </form>
+
+        <form class="auth-form" id="loginForm">
+          <div class="auth-form-title">Вход в аккаунт</div>
+
+          <label class="form-field">
+            <span>Email</span>
+            <input id="loginEmail" type="email" placeholder="you@arc.local" required />
+          </label>
+
+          <label class="form-field">
+            <span>Пароль</span>
+            <input id="loginPassword" type="password" placeholder="Пароль" required />
+          </label>
+
+          <button type="submit" class="panel-action-btn auth-submit-btn">Войти</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-stripes">
+            <span class="stripe stripe-cyan"></span>
+            <span class="stripe stripe-green"></span>
+            <span class="stripe stripe-yellow"></span>
+            <span class="stripe stripe-red"></span>
+          </div>
+
+          <div class="brand-text">
+            <span class="brand-title">ARC</span>
+            <span class="brand-subtitle">Companion</span>
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <button class="nav-btn active" data-view="stats" type="button">
+            <span class="nav-marker"></span>
+            <span>Статистика</span>
+          </button>
+
+          <button class="nav-btn" data-view="weapons" type="button">
+            <span class="nav-marker"></span>
+            <span>Пушки</span>
+          </button>
+
+          <button class="nav-btn" data-view="profile" type="button">
+            <span class="nav-marker"></span>
+            <span>Профиль</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-mini-card">
+          <div class="mini-label">Статус</div>
+          <div class="mini-value online" id="sessionStatusValue">ONLINE</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">ARC RAIDERS TRACKER</p>
+          <h1 id="pageTitle">Статистика рейдов</h1>
+        </div>
+
+        <div class="topbar-right">
+          <div class="currency-pill">
+            <span class="dot dot-light"></span>
+            <span id="moneyValue">₣ 0</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="view active" id="statsView">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number" id="totalRaidsValue">0</div>
+            <div class="stat-label">ВСЕГО РЕЙДОВ</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-number positive" id="totalProfitValue">+0</div>
+            <div class="stat-label">ОБЩАЯ ПРИБЫЛЬ</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-number negative" id="totalLossValue">-0</div>
+            <div class="stat-label">ОБЩИЕ ПОТЕРИ</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-number" id="winrateValue">0%</div>
+            <div class="stat-label">WINRATE</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-number" id="avgLootValue">0</div>
+            <div class="stat-label">СРЕДНИЙ ВЫНОС</div>
+          </div>
+        </div>
+
+        <div class="stats-main-grid">
+          <section class="panel left-stack">
+            <div class="panel-header">
+              <h2>Анализ сессии</h2>
+              <div class="panel-header-actions">
+                <button class="ghost-btn" id="addRaidBtn" type="button">Добавить рейд</button>
+                <button class="ghost-btn" id="exportJsonBtn" type="button">Экспорт JSON</button>
+                <button class="ghost-btn" id="importJsonBtn" type="button">Импорт JSON</button>
+                <button class="ghost-btn" id="quickAnalyzeBtn" type="button">Быстрый анализ</button>
+                <button class="panel-action-btn" id="deepAnalyzeBtn" type="button">Углублённый анализ</button>
+              </div>
+            </div>
+
+            <div class="analysis-layout">
+              <div class="analysis-box">
+                <div class="analysis-title">Краткий вывод</div>
+                <p class="analysis-text" id="analysisText">
+                  Добавь несколько рейдов, чтобы здесь появился нормальный анализ твоей статистики.
+                </p>
+              </div>
+
+              <div class="analysis-box">
+                <div class="analysis-title">Советы</div>
+                <ul class="analysis-list" id="analysisList">
+                  <li>Добавь последние рейды.</li>
+                  <li>Потом уже будет видно, где именно ты уходишь в минус.</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel left-stack">
+            <div class="panel-header">
+              <h2>График прибыли / убытков</h2>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="profitChart" width="1200" height="320"></canvas>
+            </div>
+          </section>
+
+          <section class="right-column">
+            <section class="panel right-panel">
+              <div class="panel-header">
+                <h2>История рейдов</h2>
+                <button class="ghost-btn" id="toggleRaidFilterBtn" type="button">Все</button>
+              </div>
+
+              <div class="raid-history fixed-history" id="raidHistory"></div>
+            </section>
+
+            <section class="panel right-panel detail-panel">
+              <div class="panel-header">
+                <h2>Детали рейда</h2>
+                <div class="panel-header-actions">
+                  <button class="ghost-btn" id="editRaidBtn" type="button" disabled>Редактировать</button>
+                  <button class="ghost-btn danger" id="deleteRaidBtn" type="button" disabled>Удалить</button>
+                </div>
+              </div>
+
+              <div class="raid-detail" id="raidDetail">
+                <div class="empty-state">Выбери рейд справа, чтобы увидеть подробности.</div>
+              </div>
+            </section>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="weaponsView">
+        <div class="weapons-layout">
+          <section class="panel panel-large">
+            <div class="panel-header">
+              <h2>Каталог оружия</h2>
+              <div class="weapon-tools">
+                <input
+                  type="text"
+                  id="weaponSearchInput"
+                  class="weapon-search"
+                  placeholder="Поиск по оружию..."
+                />
+
+                <div class="weapon-sort-row">
+                  <label class="inline-control">
+                    <span>Сортировка</span>
+                    <select id="weaponSortSelect" class="compact-select">
+                      <option value="default">По умолчанию</option>
+                      <option value="rarity-desc">Редкость ↓</option>
+                      <option value="rarity-asc">Редкость ↑</option>
+                      <option value="type-asc">Тип А-Я</option>
+                      <option value="name-asc">Название А-Я</option>
+                      <option value="name-desc">Название Я-А</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="weapon-filter-group">
+                  <button class="filter-btn active" data-filter="all" type="button">Все</button>
+                  <button class="filter-btn" data-filter="Штурмовая винтовка" type="button">AR</button>
+                  <button class="filter-btn" data-filter="Пистолет-пулемёт" type="button">SMG</button>
+                  <button class="filter-btn" data-filter="Пистолет" type="button">PISTOL</button>
+                  <button class="filter-btn" data-filter="Снайперская винтовка" type="button">SNIPER</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="weapon-grid" id="weaponGrid"></div>
+          </section>
+
+          <aside class="panel weapon-detail-panel">
+            <div class="panel-header">
+              <h2>Информация об оружии</h2>
+            </div>
+
+            <div class="weapon-preview rarity-common" id="weaponPreview">
+              <div class="weapon-preview-title" id="weaponPreviewTitle">Чайник</div>
+              <div class="weapon-preview-subtitle" id="weaponPreviewSubtitle">Полуавтоматическая штурмовая винтовка / обычный</div>
+            </div>
+
+            <div class="detail-block">
+              <div class="detail-title">Описание</div>
+              <p class="detail-text" id="weaponDescText"></p>
+            </div>
+
+            <div class="detail-block">
+              <div class="detail-title">Основное</div>
+              <div class="weapon-stat-list" id="weaponMainStats"></div>
+            </div>
+
+            <div class="detail-block">
+              <div class="detail-title">Характеристики</div>
+              <div class="weapon-stat-list" id="weaponStats"></div>
+            </div>
+
+            <div class="detail-block">
+              <div class="detail-title">Бонусы 4 уровня</div>
+              <ul class="detail-list" id="weaponBonuses"></ul>
+            </div>
+
+            <div class="detail-block">
+              <div class="detail-title">Где получить</div>
+              <p class="detail-text" id="weaponSourceText">Нет отдельной пометки.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" id="profileView">
+        <div class="profile-layout">
+          <section class="panel profile-hero">
+            <div class="profile-avatar" id="profileAvatar">
+              <span id="profileAvatarFallback">A</span>
+              <img id="profileAvatarImage" class="profile-avatar-image hidden" alt="Avatar" />
+            </div>
+
+            <div class="profile-info">
+              <div class="profile-nickname" id="profileNickname">ForRe4l</div>
+              <div class="profile-email clickable-email" id="profileEmail" title="Нажми, чтобы сменить email">
+                forreal@arc.local
+              </div>
+
+              <div class="profile-actions">
+                <button class="panel-action-btn" id="changeAvatarBtn" type="button">Сменить аватар</button>
+                <button class="ghost-btn" id="changeNicknameBtn" type="button">Сменить ник</button>
+                <button class="ghost-btn" id="changePasswordBtn" type="button">Сменить пароль</button>
+                <button class="ghost-btn" id="changeEmailBtn" type="button">Сменить email</button>
+                <button class="ghost-btn danger" id="logoutBtn" type="button">Выйти</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel balance-panel">
+            <div class="panel-header">
+              <h2>Баланс профиля</h2>
+            </div>
+
+            <div class="balance-grid">
+              <label class="form-field">
+                <span>Стартовый баланс</span>
+                <input id="profileMoneyInput" type="number" min="0" placeholder="0" />
+              </label>
+
+              <div class="balance-actions">
+                <button class="panel-action-btn" id="saveMoneyBtn" type="button">Сохранить баланс</button>
+                <button class="ghost-btn" id="resetMoneyBtn" type="button">Сбросить к 0</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel ollama-panel">
+            <div class="panel-header">
+              <h2>Ollama</h2>
+            </div>
+
+            <div class="ollama-grid">
+              <label class="form-field">
+                <span>Модель Ollama</span>
+                <input id="ollamaModelInput" type="text" placeholder="llama3.1:8b" />
+              </label>
+
+              <label class="form-field">
+                <span>URL</span>
+                <input id="ollamaUrlInput" type="text" placeholder="http://127.0.0.1:11434" />
+              </label>
+            </div>
+
+            <div class="ollama-actions">
+              <button class="ghost-btn" id="saveOllamaSettingsBtn" type="button">Сохранить настройки</button>
+              <button class="ghost-btn" id="testOllamaBtn" type="button">Проверить Ollama</button>
+            </div>
+          </section>
+
+          <div class="profile-stats-grid">
+            <div class="profile-stat panel">
+              <div class="profile-stat-value" id="profileRaidsValue">0</div>
+              <div class="profile-stat-label">РЕЙДОВ</div>
+            </div>
+
+            <div class="profile-stat panel">
+              <div class="profile-stat-value positive" id="profileProfitValue">+0</div>
+              <div class="profile-stat-label">ПРИБЫЛЬ</div>
+            </div>
+
+            <div class="profile-stat panel">
+              <div class="profile-stat-value negative" id="profileLossValue">-0</div>
+              <div class="profile-stat-label">ПОТЕРИ</div>
+            </div>
+
+            <div class="profile-stat panel">
+              <div class="profile-stat-value" id="favoriteWeaponValue">—</div>
+              <div class="profile-stat-label">ЛЮБИМОЕ ОРУЖИЕ</div>
+            </div>
+
+            <div class="profile-stat panel">
+              <div class="profile-stat-value" id="profileWinrateValue">0%</div>
+              <div class="profile-stat-label">ВЫЖИВАЕМОСТЬ</div>
+            </div>
+
+            <div class="profile-stat panel">
+              <div class="profile-stat-value" id="profileAvgLootValue">0</div>
+              <div class="profile-stat-label">СРЕДНИЙ ВЫНОС</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-overlay hidden" id="raidModalOverlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <div class="modal-kicker" id="raidModalKicker">НОВЫЙ РЕЙД</div>
+          <h3 id="raidModalTitle">Добавить рейд</h3>
+        </div>
+        <button class="modal-close" id="closeRaidModalBtn" type="button">✕</button>
+      </div>
+
+      <form class="raid-form" id="raidForm">
+        <div class="form-grid">
+          <label class="form-field">
+            <span>Результат</span>
+            <select id="raidResult" required>
+              <option value="success">Благополучно вернулся</option>
+              <option value="fail">В нокауте</option>
+            </select>
+          </label>
+
+          <label class="form-field">
+            <span>Карта</span>
+            <select id="raidMap" required></select>
+          </label>
+
+          <label class="form-field">
+            <span>Длительность рейда (мин)</span>
+            <input id="raidDuration" type="number" min="1" max="180" placeholder="12" required />
+          </label>
+
+          <label class="form-field">
+            <span>Вынесено</span>
+            <input id="raidLoot" type="number" min="0" placeholder="18000" required />
+          </label>
+
+          <label class="form-field">
+            <span>Потеряно</span>
+            <input id="raidLost" type="number" min="0" placeholder="5000" required />
+          </label>
+
+          <label class="form-field">
+            <span>Оружие</span>
+            <select id="raidWeapon" required></select>
+          </label>
+        </div>
+
+        <label class="form-field full">
+          <span>Заметка</span>
+          <textarea id="raidNote" rows="4" placeholder="Например: зажадничал на выходе и умер"></textarea>
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" class="ghost-btn" id="fillDemoRaidBtn">Демо</button>
+          <button type="button" class="ghost-btn" id="cancelRaidBtn">Отмена</button>
+          <button type="submit" class="panel-action-btn" id="raidSubmitBtn">Сохранить рейд</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="promptModalOverlay">
+    <div class="modal-card modal-card-small">
+      <div class="modal-header">
+        <div>
+          <div class="modal-kicker" id="promptModalKicker">ДЕЙСТВИЕ</div>
+          <h3 id="promptModalTitle">Введите значение</h3>
+        </div>
+        <button class="modal-close" id="closePromptModalBtn" type="button">✕</button>
+      </div>
+
+      <div class="raid-form">
+        <label class="form-field">
+          <span id="promptModalLabel">Значение</span>
+          <input id="promptModalInput" type="text" placeholder="Введите значение" />
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" class="ghost-btn" id="cancelPromptModalBtn">Отмена</button>
+          <button type="button" class="panel-action-btn" id="submitPromptModalBtn">Сохранить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="confirmModalOverlay">
+    <div class="modal-card modal-card-small">
+      <div class="modal-header">
+        <div>
+          <div class="modal-kicker" id="confirmModalKicker">ПОДТВЕРЖДЕНИЕ</div>
+          <h3 id="confirmModalTitle">Подтвердить действие</h3>
+        </div>
+        <button class="modal-close" id="closeConfirmModalBtn" type="button">✕</button>
+      </div>
+
+      <div class="raid-form">
+        <p class="confirm-text" id="confirmModalText">Ты уверен?</p>
+
+        <div class="modal-actions">
+          <button type="button" class="ghost-btn" id="cancelConfirmModalBtn">Отмена</button>
+          <button type="button" class="ghost-btn danger" id="submitConfirmModalBtn">Подтвердить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="importJsonInput" accept=".json,application/json" hidden />
+  <input type="file" id="avatarFileInput" accept="image/*" hidden />
+  <div class="toast" id="toast"></div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
